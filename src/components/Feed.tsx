@@ -72,7 +72,7 @@ export function Feed({ userId }: FeedProps) {
       }
       setHasMore(postsRes.data.length === PAGE_SIZE);
     }
-    
+
     if (reactionsRes.data) setReactions(reactionsRes.data);
     setLoading(false);
     setLoadingMore(false);
@@ -125,9 +125,6 @@ export function Feed({ userId }: FeedProps) {
     };
   }, []);
 
-  const getLikeCount = (postId: string) => reactions.filter((r) => r.post_id === postId).length;
-  const isLiked = (postId: string) => reactions.some((r) => r.post_id === postId && r.user_id === userId);
-
   const handleRefresh = useCallback(() => {
     setPage(0);
     fetchData(0, true);
@@ -162,9 +159,9 @@ export function Feed({ userId }: FeedProps) {
       </div>
 
       <div className="mx-auto mb-10 max-w-2xl">
-        <PostForm 
-          userId={userId} 
-          onPosted={() => { handleRefresh(); setReplyTo(null); }} 
+        <PostForm
+          userId={userId}
+          onPosted={() => { handleRefresh(); setReplyTo(null); }}
           replyTo={replyTo || undefined}
           onCancelReply={() => setReplyTo(null)}
         />
@@ -191,9 +188,7 @@ export function Feed({ userId }: FeedProps) {
                 <PostCard
                   post={post}
                   userId={userId}
-                  likeCount={getLikeCount(post.id)}
-                  isLiked={isLiked(post.id)}
-                  onLikeToggle={handleRefresh}
+                  onRefresh={handleRefresh}
                   onReply={(p) => { setReplyTo({ id: p.id, content: p.content }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="mb-0"
                 />

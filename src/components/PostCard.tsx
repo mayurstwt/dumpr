@@ -1,4 +1,5 @@
-import { Heart, MapPin, Share, Trash2, ShieldAlert, ChevronLeft, ChevronRight, Sparkles, MessageSquare, Bookmark, QrCode } from 'lucide-react';
+import { Heart, MapPin, Share, Trash2, ShieldAlert, ChevronLeft, ChevronRight, Plus, Sparkles, MessageSquare, QrCode } from 'lucide-react';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,9 +33,7 @@ interface PostCardProps {
     user_id: string;
   };
   userId: string;
-  likeCount: number;
-  isLiked: boolean;
-  onLikeToggle: () => void;
+  onRefresh: () => void;
   onHashtagClick?: (hashtag: string) => void;
   onReply?: (post: any) => void;
   className?: string;
@@ -44,53 +43,39 @@ interface PostCardProps {
 export function PostCard({
   post,
   userId,
-  likeCount,
-  isLiked,
-  onLikeToggle,
+  onRefresh,
   onHashtagClick,
   onReply,
   className,
   mediaClassName,
 }: PostCardProps) {
-  const [animating, setAnimating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [isBookmarked, setIsBookmarked] = useState(() => {
-  //   const saved = localStorage.getItem('weekend_bookmarks');
-  //   return saved ? JSON.parse(saved).includes(post.id) : false;
-  // });
+  const [replies, setReplies] = useState<any[]>([]);
+  const [loadingReplies, setLoadingReplies] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  // const toggleBookmark = () => {
-  //   const saved = localStorage.getItem('weekend_bookmarks');
-  //   let bookmarks = saved ? JSON.parse(saved) : [];
-  //   if (isBookmarked) {
-  //     bookmarks = bookmarks.filter((id: string) => id !== post.id);
-  //     toast.success('Removed from bookmarks');
-  //   } else {
-  //     bookmarks.push(post.id);
-  //     toast.success('Saved to bookmarks');
-  //   }
-  //   localStorage.setItem('weekend_bookmarks', JSON.stringify(bookmarks));
-  //   setIsBookmarked(!isBookmarked);
-  // };
+  useEffect(() => {
+    if (isModalOpen) {
+      const fetchReplies = async () => {
+        setLoadingReplies(true);
+        const { data } = await supabase
+          .from('posts')
+          .select('*')
+          .like('content', `>>[${post.id}]%`)
+          .order('created_at', { ascending: true });
+        if (data) setReplies(data);
+        setLoadingReplies(false);
+      };
+      fetchReplies();
+    }
+  }, [isModalOpen, post.id]);
 
   const mediaUrls = post.media_url?.startsWith('[')
     ? JSON.parse(post.media_url) as string[]
     : post.media_url ? [post.media_url] : [];
 
   const isOwner = post.user_id === userId;
-
-  const toggleLike = async () => {
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 300);
-
-    if (isLiked) {
-      await supabase.from('reactions').delete().eq('post_id', post.id).eq('user_id', userId);
-    } else {
-      await supabase.from('reactions').insert({ post_id: post.id, user_id: userId });
-    }
-    onLikeToggle();
-  };
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this dump?')) return;
@@ -99,7 +84,7 @@ export function PostCard({
       const { error } = await supabase.from('posts').delete().eq('id', post.id).eq('user_id', userId);
       if (error) throw error;
       toast.success('Dump deleted');
-      onLikeToggle(); // Refresh feed
+      onRefresh(); // Refresh feed
     } catch (err: any) {
       toast.error(err.message || 'Failed to delete');
     } finally {
@@ -239,56 +224,68 @@ export function PostCard({
         <div className="mt-auto flex items-center justify-end pt-4 text-sm relative z-10">
           <div className="flex items-center gap-1">
             <button
-              onClick={toggleLike}
-              className={cn(
-                "flex items-center gap-1 rounded-full px-2.5 py-1.5 transition-all",
-                isLiked ? 'text-dive-bar-red bg-dive-bar-red/10' : 'text-muted-foreground hover:text-dive-bar-red hover:bg-dive-bar-red/5',
-                animating && 'scale-125'
-              )}
-            >
-              <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
-              {likeCount > 0 && <span className="text-xs font-medium">{likeCount}</span>}
-            </button>
-
-            <button
-              onClick={() => onReply?.(post)}
+              onClick={(e) => { e.stopPropagation(); onReply?.(post); }}
               className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary transition-all"
               title="Reply"
             >
               <MessageSquare className="w-4 h-4" />
             </button>
 
-            <Popover>
+            <Popover onOpenChange={(open) => !open && setShowEmojiPicker(false)}>
               <PopoverTrigger asChild>
                 <button
+                  onClick={(e) => e.stopPropagation()}
                   className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary transition-all"
                   title="React"
                 >
                   <Sparkles className="w-4 h-4" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-2 rounded-full flex gap-1 bg-card/95 backdrop-blur-md border-border/50">
-                {['🍺', '🔥', '🥴', '🦾', '❤️'].map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => {
-                      toast.success(`${emoji} reaction added!`);
-                      if (emoji === '❤️') toggleLike();
-                    }}
-                    className="hover:scale-125 transition-transform p-1.5 text-lg"
-                  >
-                    {emoji}
-                  </button>
-                ))}
+              <PopoverContent
+                className="w-auto p-2 rounded-2xl flex flex-col gap-2 bg-card/95 backdrop-blur-md border border-border/50 shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {!showEmojiPicker ? (
+                  <div className="flex gap-1 items-center">
+                    {['🍺', '🔥', '🥴', '❤️'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => {
+                          toast.success(`${emoji} reaction added!`);
+                          setShowEmojiPicker(false);
+                        }}
+                        className="hover:scale-125 transition-transform p-1.5 text-lg"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setShowEmojiPicker(true)}
+                      className="hover:scale-125 transition-transform p-1.5 flex items-center justify-center text-muted-foreground hover:text-primary"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="min-w-[280px]" onClick={(e) => e.stopPropagation()}>
+                    <EmojiPicker
+                      onEmojiClick={(e) => {
+                        toast.success(`${e.emoji} reaction added!`);
+                        setShowEmojiPicker(false);
+                      }}
+                      theme={Theme.DARK}
+                      lazyLoadEmojis={true}
+                    />
+                  </div>
+                )}
               </PopoverContent>
             </Popover>
-          </div>
-        </div>
+          </div>        </div>
       </article>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className={cn("max-w-[500px] border", currentVibe)}>
-          <div className="mb-3 flex items-center justify-end text-xs text-muted-foreground">
+        <DialogContent className={cn("max-w-[500px] border max-h-[95vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]", currentVibe)}>
+          <div className="mb-3 flex items-center justify-end text-xs text-muted-foreground pr-6 pt-1">
             <span className="shrink-0 text-right text-xs text-zinc-500 max-w-[100px] break-words">
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
             </span>
@@ -329,6 +326,16 @@ export function PostCard({
 
           <div className="mt-6 flex flex-wrap items-center gap-2 pt-4 border-t border-border/50">
             <button
+              onClick={() => {
+                onReply?.(post);
+                setIsModalOpen(false);
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-foreground bg-primary hover:opacity-90 transition-all font-semibold"
+            >
+              <MessageSquare className="w-4 h-4" /> Reply
+            </button>
+
+            <button
               onClick={handleShare}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:text-primary hover:bg-secondary transition-all"
             >
@@ -353,17 +360,6 @@ export function PostCard({
               </DialogContent>
             </Dialog>
 
-            {/* <button
-            onClick={toggleBookmark}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 flex-1 justify-center rounded-full text-sm transition-all border",
-              isBookmarked ? "text-primary bg-primary/10 border-primary/20" : "text-muted-foreground border-transparent hover:text-primary hover:bg-secondary"
-            )}
-          >
-            <Bookmark className={cn("w-4 h-4", isBookmarked && "fill-current")} /> 
-            {isBookmarked ? 'Saved' : 'Save'}
-          </button> */}
-
             <button
               onClick={handleReport}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-muted-foreground hover:text-dive-bar-red hover:bg-secondary transition-all"
@@ -379,6 +375,31 @@ export function PostCard({
               >
                 <Trash2 className="w-4 h-4" /> Delete
               </button>
+            )}
+          </div>
+
+          {/* Comments Section */}
+          <div className="mt-4 pt-4 border-t border-border/50 max-h-[40vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Comments</h4>
+            {loadingReplies ? (
+              <div className="flex justify-center p-4">
+                <p className="text-xs text-muted-foreground animate-pulse">Loading comments...</p>
+              </div>
+            ) : replies.length > 0 ? (
+              <div className="space-y-3">
+                {replies.map(reply => (
+                  <div key={reply.id} className="bg-secondary/30 rounded-lg p-3 text-sm border border-border/40">
+                    <div className="text-[10px] text-muted-foreground mb-1">
+                      {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
+                    </div>
+                    <p className="whitespace-pre-wrap break-words text-foreground/90" dangerouslySetInnerHTML={{ __html: renderContent(reply.content) }} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-secondary/10 rounded-lg p-4 text-center border border-border/20 border-dashed">
+                <p className="text-xs text-muted-foreground">No comments yet. Be the first to reply! 🍻</p>
+              </div>
             )}
           </div>
         </DialogContent>
