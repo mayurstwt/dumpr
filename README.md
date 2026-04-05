@@ -1,8 +1,8 @@
-# Weekend Dump 🍺
+# Dumpr 🍺
 
 **No accounts. No history. No trace.**
 
-Weekend Dump is a hyper-ephemeral, anonymous social media platform designed for sharing the highlights of your weekend. Built with a "burn after reading" philosophy, it only opens its gates from Friday 6 PM to Sunday midnight.
+Dumpr is a fast, anonymous, auto-deleting social feed designed to handle raw weekend posts. There are no user accounts, no followers, and no history. Everything posted is automatically wiped. Built with a "burn after reading" philosophy, it only opens its gates from Friday 6 PM to Sunday midnight.
 
 ## 🚀 Recent Updates & Features
 - **Media Expansion**: Click on any image or video to expand it to full screen for a better viewing experience.

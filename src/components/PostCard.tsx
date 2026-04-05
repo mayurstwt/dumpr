@@ -112,7 +112,7 @@ export function PostCard({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Weekend Dump',
+          title: 'Dumpr',
           text: post.content,
           url: url,
         });

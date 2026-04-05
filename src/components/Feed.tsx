@@ -139,7 +139,7 @@ export function Feed({ userId }: FeedProps) {
         {isWeekend ? (
           <>
             <h1 className="text-3xl md:text-4xl font-bold neon-text text-primary">
-              Weekend Dump 🍺
+              Dumpr 🍺
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
               No accounts. No history. No trace.
@@ -148,7 +148,7 @@ export function Feed({ userId }: FeedProps) {
         ) : (
           <>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Weekday Dump 💼
+              Dumpr 💼
             </h1>
             <div className="mt-2 inline-flex flex-col items-center justify-center space-y-1 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2">
               <span className="text-xs font-semibold uppercase tracking-widest text-primary">Weekend Countdown</span>
