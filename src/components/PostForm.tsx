@@ -55,9 +55,14 @@ export function PostForm({ userId, onPosted, replyTo, onCancelReply }: PostFormP
       return;
     }
 
-    const validFiles = selectedFiles.filter(f => f.size <= 10 * 1024 * 1024);
+    const validFiles = selectedFiles.filter(f => {
+      const isVideo = f.type.startsWith('video/');
+      const limit = isVideo ? 50 * 1024 * 1024 : 5 * 1024 * 1024; // 50MB for video, 5MB for image
+      return f.size <= limit;
+    });
+
     if (validFiles.length < selectedFiles.length) {
-      toast.error('Some files were too large (max 10MB)');
+      toast.error('Some files were too large (Images: max 5MB, Videos: max 50MB)');
     }
 
     setFiles(prev => [...prev, ...validFiles]);

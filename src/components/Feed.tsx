@@ -6,6 +6,7 @@ import { Loader2, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useWeekendCountdown } from '@/hooks/useWeekendCountdown';
+import { ProductHuntBadge } from './ProductHuntBadge';
 
 
 interface FeedProps {
@@ -203,6 +204,11 @@ export function Feed({ userId }: FeedProps) {
         {!hasMore && posts.length > 0 && (
           <p className="text-muted-foreground text-sm">You've reached the end of the dump. 🍻</p>
         )}
+      </div>
+
+      {/* Footer / Badge */}
+      <div className="mt-16 pb-8 border-t border-border/50 pt-8 max-w-2xl mx-auto">
+        <ProductHuntBadge />
       </div>
 
       {showScrollTop && (

@@ -5,12 +5,14 @@
 Dumpr is a fast, anonymous, auto-deleting social feed designed to handle raw weekend posts. There are no user accounts, no followers, and no history. Everything posted is automatically wiped. Built with a "burn after reading" philosophy, it only opens its gates from Friday 6 PM to Sunday midnight.
 
 ## 🚀 Recent Updates & Features
+- **Rebranding to Dumpr**: Sleek platform rebrand fully embodying the "Burn After Reading" ethos.
 - **Media Expansion**: Click on any image or video to expand it to full screen for a better viewing experience.
-- **Improved Responsiveness**: The grid layout now adapts seamlessly from mobile phones to ultra-wide monitors.
+- **Real-time Comments**: Integrated a real-time comments view directly within the post expansion modal.
+- **Improved Performance**: Fast client-side image compression alongside lazy-loaded emojis and UI components.
+- **Media Support & Limits**: Robust uploads supporting images (up to 5MB, optimized) and videos (up to 50MB).
 - **Global Feed**: Removed location-based fragmentation to create a single, unified stream of weekend highlights.
 - **Anonymous Auth**: Seamless, account-less authentication using device-based IDs.
-- **Real-time Reactions**: Instant feedback with animated like buttons.
-- **Media Support**: Support for both images and videos (up to 10MB).
+- **Real-time Reactions**: Instant feedback with custom animated reactions.
 
 ## 🛠️ Tech Stack
 - **Framework**: React + Vite

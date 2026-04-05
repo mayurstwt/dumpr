@@ -7,6 +7,7 @@ import { AppBackground } from '@/components/AppBackground';
 import { Loader2, ArrowLeft, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAnonymousAuth } from '@/hooks/useAnonymousAuth';
+import { ProductHuntBadge } from '@/components/ProductHuntBadge';
 
 export default function PostView() {
   const { id } = useParams();
@@ -75,9 +76,7 @@ export default function PostView() {
         <PostCard 
           post={post}
           userId={userId || ''}
-          likeCount={likeCount}
-          isLiked={isLiked}
-          onLikeToggle={fetchData}
+          onRefresh={fetchData}
           onReply={(p) => setReplyTo({ id: p.id, content: p.content })}
         />
 
@@ -102,9 +101,7 @@ export default function PostView() {
                 key={reply.id}
                 post={reply}
                 userId={userId || ''}
-                likeCount={0} // Deep nested reactions coming later
-                isLiked={false}
-                onLikeToggle={fetchData}
+                onRefresh={fetchData}
                 onReply={(p) => setReplyTo({ id: p.id, content: p.content })}
                 className="bg-secondary/20 scale-[0.98] origin-top"
               />
@@ -115,6 +112,10 @@ export default function PostView() {
               </p>
             )}
           </div>
+        </div>
+
+        <div className="mt-16 border-t border-border/50 pt-8 pb-8">
+          <ProductHuntBadge />
         </div>
       </div>
     </AppBackground>
