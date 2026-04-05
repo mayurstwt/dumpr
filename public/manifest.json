@@ -1,0 +1,16 @@
+{
+  "name": "Weekend Dump",
+  "short_name": "Dump",
+  "description": "No accounts. No history. No trace.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    }
+  ]
+}

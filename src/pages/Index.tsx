@@ -2,6 +2,7 @@ import { isWeekendOpen } from '@/lib/weekend';
 import { useAnonymousAuth } from '@/hooks/useAnonymousAuth';
 import { ClosedGate } from '@/components/ClosedGate';
 import { Feed } from '@/components/Feed';
+import { AppBackground } from '@/components/AppBackground';
 import { Loader2 } from 'lucide-react';
 
 const Index = () => {
@@ -17,24 +18,24 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="dive-bar-gradient min-h-screen flex items-center justify-center">
+      <AppBackground centered>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      </AppBackground>
     );
   }
 
   if (!userId) {
     return (
-      <div className="dive-bar-gradient min-h-screen flex items-center justify-center">
+      <AppBackground centered>
         <p className="text-muted-foreground">Failed to authenticate. Refresh to try again.</p>
-      </div>
+      </AppBackground>
     );
   }
 
   return (
-    <div className="dive-bar-gradient min-h-screen">
+    <AppBackground>
       <Feed userId={userId} />
-    </div>
+    </AppBackground>
   );
 };
 

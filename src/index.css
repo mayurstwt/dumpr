@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -49,6 +49,40 @@
     --sidebar-border: 220 15% 18%;
     --sidebar-ring: 38 92% 50%;
   }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 38 92% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 220 20% 15%;
+
+    --muted: 0 0% 94%;
+    --muted-foreground: 220 10% 40%;
+
+    --accent: 0 72% 51%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 90%;
+    --ring: 38 92% 50%;
+
+    --neon-glow: 38 92% 50%;
+    --dive-bar-red: 0 72% 51%;
+    --smoke: 0 0% 70%;
+  }
 }
 
 @layer base {
@@ -59,6 +93,12 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Inter', sans-serif;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -77,5 +117,16 @@
 
   .dive-bar-gradient {
     background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 20% 5%) 100%);
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% { 
+    border-color: rgba(245, 158, 11, 0.3); 
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.05); 
+  }
+  50% { 
+    border-color: rgba(245, 158, 11, 0.6); 
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.15); 
   }
 }
