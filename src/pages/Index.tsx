@@ -1,20 +1,20 @@
-import { isWeekendOpen } from '@/lib/weekend';
 import { useAnonymousAuth } from '@/hooks/useAnonymousAuth';
-import { ClosedGate } from '@/components/ClosedGate';
 import { Feed } from '@/components/Feed';
 import { AppBackground } from '@/components/AppBackground';
 import { Loader2 } from 'lucide-react';
+import { useWeekendCountdown } from '@/hooks/useWeekendCountdown';
+import { useEffect } from 'react';
 
 const Index = () => {
   const { userId, loading } = useAnonymousAuth();
+  const { mode } = useWeekendCountdown();
 
-  // Uncomment the line below to enforce weekend-only access:
-  // if (!isWeekendOpen()) return <ClosedGate />;
-
-  // For development, we keep it open. Toggle the above when going live.
-  const open = isWeekendOpen();
-
-  if (!open) return <ClosedGate />;
+  // Apply mode class to <html> so CSS variables switch automatically
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('mode-weekday', 'mode-weekend');
+    root.classList.add(`mode-${mode}`);
+  }, [mode]);
 
   if (loading) {
     return (

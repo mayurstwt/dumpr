@@ -1,43 +1,53 @@
 import { useState, useEffect } from 'react';
+import { getAppMode, getNextModeSwitch, type AppMode } from '@/lib/weekend';
 
-export function useWeekendCountdown() {
+interface WeekendCountdownResult {
+  mode: AppMode;
+  /** @deprecated use mode === 'weekend' */
+  isWeekend: boolean;
+  /** Formatted countdown like "3d 2h 15m 22s" */
+  timeLeft: string;
+  /** Label for what's coming next, e.g. "🍺 Weekend starts" */
+  nextLabel: string;
+}
+
+export function useWeekendCountdown(): WeekendCountdownResult {
+  const [mode, setMode] = useState<AppMode>(getAppMode());
   const [timeLeft, setTimeLeft] = useState('');
-  const [weekend, setWeekend] = useState(false);
+  const [nextLabel, setNextLabel] = useState('');
 
   useEffect(() => {
-    const checkTime = () => {
+    const tick = () => {
       const now = new Date();
-      const day = now.getDay();
-      const hours = now.getHours();
+      const currentMode = getAppMode(now);
+      setMode(currentMode);
 
-      const isWeekendNow = day === 0 || day === 6 || (day === 5 && hours >= 17);
-      setWeekend(isWeekendNow);
+      const { label, time } = getNextModeSwitch();
+      setNextLabel(label);
 
-      if (!isWeekendNow) {
-        const nextFriday = new Date(now);
-        let daysToFriday = 5 - day;
-        if (daysToFriday < 0 || (daysToFriday === 0 && hours >= 17)) {
-            daysToFriday += 7;
-        }
-        nextFriday.setDate(now.getDate() + daysToFriday);
-        nextFriday.setHours(17, 0, 0, 0);
-
-        const diff = nextFriday.getTime() - now.getTime();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / 1000 / 60) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-
-        setTimeLeft(`${days}d ${hrs}h ${mins}m ${secs}s`);
-      } else {
+      const diff = time.getTime() - now.getTime();
+      if (diff <= 0) {
         setTimeLeft('');
+        return;
       }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      const parts: string[] = [];
+      if (days > 0) parts.push(`${days}d`);
+      parts.push(`${String(hrs).padStart(2, '0')}h`);
+      parts.push(`${String(mins).padStart(2, '0')}m`);
+      parts.push(`${String(secs).padStart(2, '0')}s`);
+      setTimeLeft(parts.join(' '));
     };
-    
-    checkTime();
-    const interval = setInterval(checkTime, 1000);
-    return () => clearInterval(interval);
+
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
 
-  return { isWeekend: weekend, timeLeft };
+  return { mode, isWeekend: mode === 'weekend', timeLeft, nextLabel };
 }

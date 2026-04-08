@@ -2,12 +2,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PostCard } from './PostCard';
 import { PostForm } from './PostForm';
-import { Loader2, ArrowUp } from 'lucide-react';
+import { Loader2, ArrowUp, Briefcase, Beer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useWeekendCountdown } from '@/hooks/useWeekendCountdown';
 import { ProductHuntBadge } from './ProductHuntBadge';
-
+import { getCurrentPeriodStart } from '@/lib/weekend';
 
 interface FeedProps {
   userId: string;
@@ -28,7 +28,6 @@ interface Reaction {
   user_id: string;
 }
 
-
 export function Feed({ userId }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [reactions, setReactions] = useState<Reaction[]>([]);
@@ -38,12 +37,12 @@ export function Feed({ userId }: FeedProps) {
   const [page, setPage] = useState(0);
   const [replyTo, setReplyTo] = useState<{ id: string; content: string } | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const { isWeekend, timeLeft } = useWeekendCountdown();
-  const PAGE_SIZE = 12;
+  const { mode, nextLabel, timeLeft } = useWeekendCountdown();
+  const PAGE_SIZE = 20;
 
   const { ref, entry } = useIntersectionObserver<HTMLDivElement>({
     threshold: 0.1,
-    rootMargin: '100px',
+    rootMargin: '200px',
   });
 
   const fetchData = useCallback(async (pageNum: number, isInitial = false) => {
@@ -53,24 +52,20 @@ export function Feed({ userId }: FeedProps) {
     const start = pageNum * PAGE_SIZE;
     const end = start + PAGE_SIZE - 1;
 
-    let query = supabase
-      .from('posts')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .range(start, end);
-
     const [postsRes, reactionsRes] = await Promise.all([
-      query,
+      supabase
+        .from('posts')
+        .select('*')
+        .gte('created_at', getCurrentPeriodStart().toISOString())
+        .order('created_at', { ascending: false })
+        .range(start, end),
       supabase.from('reactions').select('*'),
     ]);
 
     if (postsRes.data) {
-      const filteredPosts = postsRes.data.filter(p => !p.content.startsWith('>>['));
-      if (isInitial) {
-        setPosts(filteredPosts);
-      } else {
-        setPosts((prev) => [...prev, ...filteredPosts]);
-      }
+      const filtered = postsRes.data.filter(p => !p.content.startsWith('>>['));
+      if (isInitial) setPosts(filtered);
+      else setPosts(prev => [...prev, ...filtered]);
       setHasMore(postsRes.data.length === PAGE_SIZE);
     }
 
@@ -79,86 +74,94 @@ export function Feed({ userId }: FeedProps) {
     setLoadingMore(false);
   }, []);
 
-  useEffect(() => {
-    fetchData(0, true);
-  }, [fetchData]);
+  useEffect(() => { fetchData(0, true); }, [fetchData]);
 
   useEffect(() => {
     if (entry?.isIntersecting && hasMore && !loadingMore && !loading) {
-      setPage((p) => {
-        const next = p + 1;
-        fetchData(next);
-        return next;
-      });
+      setPage(p => { const next = p + 1; fetchData(next); return next; });
     }
   }, [entry?.isIntersecting, hasMore, loadingMore, loading, fetchData]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 1000);
-    };
+    const handleScroll = () => setShowScrollTop(window.scrollY > 800);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('feed-updates')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'posts' },
-        (payload) => {
-          setPosts((prev) => [payload.new as Post, ...prev]);
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) => {
+        const newPost = payload.new as Post;
+        if (!newPost.content.startsWith('>>[')) {
+          setPosts(prev => [newPost, ...prev]);
         }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'reactions' },
-        async () => {
-          const { data } = await supabase.from('reactions').select('*');
-          if (data) setReactions(data);
-        }
-      )
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, async () => {
+        const { data } = await supabase.from('reactions').select('*');
+        if (data) setReactions(data);
+      })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const handleRefresh = useCallback(() => {
-    setPage(0);
-    fetchData(0, true);
-  }, [fetchData]);
+  const handleRefresh = useCallback(() => { setPage(0); fetchData(0, true); }, [fetchData]);
+
+  const isWeekend = mode === 'weekend';
 
   return (
-    <div className="relative mx-auto max-w-7xl px-4 py-6 md:px-6">
-      <div className="mx-auto mb-6 max-w-2xl text-center">
-        {isWeekend ? (
-          <>
-            <h1 className="text-3xl md:text-4xl font-bold neon-text text-primary">
-              Dumpr 🍺
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              No accounts. No history. No trace.
-            </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              Dumpr 💼
-            </h1>
-            <div className="mt-2 inline-flex flex-col items-center justify-center space-y-1 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">Weekend Countdown</span>
-              <span className="font-mono text-sm tracking-wider tabular-nums text-foreground">{timeLeft}</span>
-            </div>
-            <p className="text-muted-foreground text-xs mt-3">
-              Office politics. Caffeine crashes. Watercooler tea.
-            </p>
-          </>
+    <div className="relative mx-auto max-w-[1600px] px-3 py-6 md:px-5">
+
+      {/* ── Header ── */}
+      <div className="mx-auto mb-8 max-w-2xl text-center space-y-3">
+        <div className="flex items-center justify-center gap-3">
+          <h1 className={cn(
+            'text-4xl md:text-5xl font-bold tracking-tight',
+            isWeekend ? 'neon-text text-primary' : 'text-primary',
+          )}>
+            Dumpr
+          </h1>
+          {isWeekend
+            ? <Beer className="w-8 h-8 text-primary" strokeWidth={1.5} />
+            : <Briefcase className="w-8 h-8 text-primary" strokeWidth={1.5} />
+          }
+        </div>
+
+        {/* Mode Badge */}
+        <div className={cn(
+          'inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border backdrop-blur-sm mode-badge-pulse',
+          isWeekend
+            ? 'bg-primary/10 border-primary/30 text-primary'
+            : 'bg-primary/10 border-primary/30 text-primary',
+        )}>
+          {isWeekend ? (
+            <><Beer className="w-4 h-4" /> Weekend Chaos Mode</>
+          ) : (
+            <><Briefcase className="w-4 h-4" /> Corporate Dump Mode</>
+          )}
+        </div>
+
+        <p className="text-muted-foreground text-sm">
+          {isWeekend
+            ? 'No accounts. No history. No trace.'
+            : 'Office politics. Caffeine crashes. Watercooler tea.'}
+        </p>
+
+        {/* Countdown to mode switch */}
+        {timeLeft && (
+          <div className="inline-flex flex-col items-center gap-0.5 rounded-xl border border-border/50 bg-secondary/30 px-4 py-2">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              {nextLabel} in
+            </span>
+            <span className="font-mono text-sm font-bold tracking-wider tabular-nums text-foreground">
+              {timeLeft}
+            </span>
+          </div>
         )}
       </div>
 
+      {/* ── Post Form ── */}
       <div className="mx-auto mb-10 max-w-2xl">
         <PostForm
           userId={userId}
@@ -168,30 +171,35 @@ export function Feed({ userId }: FeedProps) {
         />
       </div>
 
+      {/* ── Pinterest Masonry Grid ── */}
       <div className="w-full">
         {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-7 h-7 animate-spin text-muted-foreground" />
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
-              No dumps yet. Be the first. 🎯
+          <div className="text-center py-20 space-y-2">
+            <p className="text-4xl">{isWeekend ? '🍺' : '💼'}</p>
+            <p className="text-muted-foreground text-lg font-medium">
+              {isWeekend ? 'No dumps yet. Be the first.' : 'No corporate chaos yet. Dump yours.'}
             </p>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+          <div
+            className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 masonry-grid"
+            style={{ columnGap: '12px' }}
+          >
             {posts.map((post) => (
-              <div
-                key={post.id}
-                className="break-inside-avoid"
-              >
+              <div key={post.id} className="masonry-item">
                 <PostCard
                   post={post}
                   userId={userId}
                   onRefresh={handleRefresh}
-                  onReply={(p) => { setReplyTo({ id: p.id, content: p.content }); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="mb-0"
+                  onReply={(p) => {
+                    setReplyTo({ id: p.id, content: p.content });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  relatedPosts={posts.filter(p => p.id !== post.id).slice(0, 12)}
                 />
               </div>
             ))}
@@ -199,25 +207,29 @@ export function Feed({ userId }: FeedProps) {
         )}
       </div>
 
-      <div ref={ref} className="h-10 flex justify-center items-center mt-8">
+      {/* ── Infinite scroll sentinel ── */}
+      <div ref={ref} className="h-16 flex justify-center items-center mt-4">
         {loadingMore && <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />}
         {!hasMore && posts.length > 0 && (
-          <p className="text-muted-foreground text-sm">You've reached the end of the dump. 🍻</p>
+          <p className="text-muted-foreground text-sm">
+            {isWeekend ? "You've reached the end of the dump. 🍻" : "That's all the corporate chaos for now. ☕"}
+          </p>
         )}
       </div>
 
-      {/* Footer / Badge */}
+      {/* ── Footer ── */}
       <div className="mt-16 pb-8 border-t border-border/50 pt-8 max-w-2xl mx-auto">
         <ProductHuntBadge />
       </div>
 
+      {/* ── Scroll to top ── */}
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-2xl animate-in fade-in slide-in-from-bottom-4 transition-all hover:scale-110 active:scale-95"
+          className="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-primary text-primary-foreground shadow-2xl animate-slide-up transition-all hover:scale-110 active:scale-95"
           title="Scroll to top"
         >
-          <ArrowUp className="w-6 h-6" />
+          <ArrowUp className="w-5 h-5" />
         </button>
       )}
     </div>

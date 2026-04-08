@@ -1,87 +1,122 @@
-# Dumpr 🍺
+# Dumpr
 
-**No accounts. No history. No trace.**
+## 🚀 Introduction
 
-Dumpr is a fast, anonymous, auto-deleting social feed designed to handle raw weekend posts. There are no user accounts, no followers, and no history. Everything posted is automatically wiped. Built with a "burn after reading" philosophy, it only opens its gates from Friday 6 PM to Sunday midnight.
-
-## 🚀 Recent Updates & Features
-- **Rebranding to Dumpr**: Sleek platform rebrand fully embodying the "Burn After Reading" ethos.
-- **Media Expansion**: Click on any image or video to expand it to full screen for a better viewing experience.
-- **Real-time Comments**: Integrated a real-time comments view directly within the post expansion modal.
-- **Improved Performance**: Fast client-side image compression alongside lazy-loaded emojis and UI components.
-- **Media Support & Limits**: Robust uploads supporting images (up to 5MB, optimized) and videos (up to 50MB).
-- **Global Feed**: Removed location-based fragmentation to create a single, unified stream of weekend highlights.
-- **Anonymous Auth**: Seamless, account-less authentication using device-based IDs.
-- **Real-time Reactions**: Instant feedback with custom animated reactions.
+**Dumpr** is a modern social platform designed for users to quickly "dump" or share their thoughts, images, and updates with the community. It features real-time interactions, seamless post expansion with an integrated comments view, client-side image compression, and performant lazy loading. Built entirely to provide an engaging, responsive, and visually appealing experience.
 
 ## 🛠️ Tech Stack
-- **Framework**: React + Vite
-- **Styling**: Tailwind CSS + Framer Motion
-- **Backend/DB**: Supabase (PostgreSQL + Storage)
-- **UI Components**: Shadcn/UI + Radix UI
-- **Icons**: Lucide React
 
-## 🔮 Future Roadmap (50 Features & Changes)
-
-*Prioritized by Importance Level*
-
-### 🔥 Critical / High Priority
-1. **Real-time Feed Updates**: Auto-refresh the feed when new posts are made using Supabase Realtime.
-2. **Infinite Scroll**: Replace pagination with a smooth infinite scroll for endless dumping.
-3. **PWA Support**: Install Weekend Dump as a native app on iOS and Android.
-4. **Post Sharing**: Generate unique shareable links for individual dumps.
-5. **Report & Moderation**: Crowdsourced reporting and an automated NSFW filter.
-6. **Dark/Light Mode**: Full theme support with system preference detection.
-7. **Multi-Image Dumps**: Support for multiple images in a carousel layout.
-8. **GIF Integration**: Giphy search built directly into the post composer.
-9. **Post Deletion**: Allow users to delete their own dumps within their current session.
-10. **Rich Text Support**: Support for bold, italics, and clickable links in posts.
-
-### ⚡ Medium Priority
-11. **Hashtags**: Discovery and filtering via `#weekend` tags.
-12. **Custom Reactions**: Go beyond likes with custom weekend-themed emojis (🍺, 🔥, 🥴).
-13. **Threaded Replies**: Allow users to comment on specific dumps.
-14. **Audio Posts**: Voice-note style dumps for the lazy weekenders.
-15. **Trending Sidebar**: Highlight the most talked-about topics of the weekend.
-16. **Search**: Search through the current weekend's history.
-17. **Blur Placeholder**: Smooth image loading with blurred LQIP placeholders.
-18. **Video Transcoding**: Optimize videos for faster playback on mobile data.
-19. **Mentions**: Tag other anonymous users with @ID.
-20. **Bookmark/Save**: Let users save their favorite dumps locally.
-21. **Scroll-to-Top**: Quick navigation back to the top of the feed.
-22. **Honeypot/Spam Protection**: Enhanced anti-bot measures.
-23. **Localization**: Support for multiple languages.
-24. **Accessibility Audit**: Full WCAG 2.1 compliance for screen readers.
-25. **Drink Customization**: Pick your weekend icon (Beer, Wine, Coffee, etc.).
-26. **Custom Backgrounds**: Allow users to pick a "vibe" for their post.
-27. **QR Code Sharing**: Generate a QR code to quickly share the site at parties.
-28. **Mobile Notifications**: Opt-in to get notified when the gates open on Friday.
-29. **Polls**: Add interactive polls to dumps.
-30. **Drafts**: Save a dump draft locally if you're not ready to post.
-
-### 🌟 Low Priority / Nice to Have
-31. **Weekend Countdown**: A live timer showing when the next dump starts.
-32. **Historical Archives**: Access past weekend dumps in a read-only mode.
-33. **Post Analytics**: See how many people viewed your anonymous dump.
-34. **Achievement System**: Unlock virtual badges for consistent weekend dumping.
-35. **Collaborative Dumps**: Group posts for friends or events.
-36. **Interactive Map**: A heat-map of where the most dumps are coming from.
-37. **Custom Fonts**: Choose from a selection of typography for your posts.
-38. **Micro-Animations**: Add subtle Lottie animations for UI interactions.
-39. **Offline Mode**: View cached dumps when the internet is spotty.
-41. **Social Login (Optional)**: For users who *want* to persist history.
-42. **API Access**: Public API for developers to build on top of Weekend Dump.
-43. **Discord Integration**: Bot to share weekend highlights to a server.
-44. **Chrome Extension**: Quick-post from the browser.
-45. **Theme Builder**: Let users create and share their own UI themes.
-46. **AI Content Summary**: Get a summary of the "Weekend Vibe" using LLMs.
-
-### Phase 5: Polish & Deployment (Low Priority)
-- [x] **Unit Testing**: 100% test coverage for core business logic.
-- [x] **E2E Testing**: Automated browser tests for critical flows.
-- [x] **CI/CD Pipeline**: fully automated deployments.
-- [x] **Dockerization**: Containerize for easy scaling.
-- [x] **Weekend Countdown**: A live timer showing when the next dump starts.
+- **Frontend:** React, TypeScript, Vite
+- **Styling:** Tailwind CSS, Shadcn UI, Class Variance Authority
+- **Backend & Database:** Supabase (PostgreSQL, Edge Functions, Realtime subscriptions)
+- **State Management & Data Fetching:** React Query, React Hook Form
+- **Testing:** Playwright (E2E), Vitest (Unit)
 
 ---
-*Created with ❤️ for the weekenders.*
+
+## 📁 Project Structure
+
+Here is a visual breakdown of the application hierarchy:
+
+```text
+weekend-dump/
+├── .github/                   # GitHub Actions and workflow configurations
+├── public/                    # Static assets accessible to the browser directly
+├── src/                       # Primary source code for the application
+│   ├── components/            # Reusable UI components (buttons, modals, feeds, etc.)
+│   ├── hooks/                 # Custom React hooks containing shared logic
+│   ├── integrations/          # External API clients and configurations (e.g., Supabase)
+│   ├── lib/                   # Utility functions and helper methods
+│   ├── pages/                 # Full-page components correlating to application routes
+│   ├── App.tsx                # The root component that defines all application routing
+│   └── main.tsx               # The main entry file that mounts the App onto the DOM
+├── supabase/                  # Backend configurations, database migrations, and edge functions
+├── tests/                     # Automated testing routines (E2E)
+├── .env.example               # Template for the required environment variables
+├── package.json               # Defines project dependencies and available script commands
+├── tailwind.config.ts         # Configuration for Tailwind CSS styling
+└── vite.config.ts             # Configuration file for the Vite bundler
+```
+
+### Detailed Folder Breakdown
+
+- **/src**: The lifeblood of the frontend application containing all user interfaces, context providers, and client-side logic.
+- **/src/components**: Houses modular React components split between atomic `ui` elements (via Shadcn) and domain-specific pieces like `PostCard` and `PostForm`.
+- **/src/pages**: Contains the primary view layers (`Index`, `PostView`) which are tied to specific router endpoints within the app.
+- **/public**: Stores static files like `favicon.ico`, `_redirects`, and the `manifest.json`. Files here serve directly from the application root without being processed by webpack/vite.
+- **/hooks**: Provides reusable React logic, such as `.ts` files for infinite scrolling (`useIntersectionObserver.ts`), anonymous authentication wrappers, and layout detections.
+- **/supabase**: Holds all database functions, configurations (`config.toml`), and SQL migrations required to maintain our Supabase backend consistency locally and in production.
+- **/tests**: Contains End-to-End configuration tests utilizing Playwright to ensure the stability of critical user paths.
+
+### Key File Explanations
+
+- **`src/App.tsx`**: The core architecture file wrapping the application in essential providers (QueryClient, ThemeProvider, and Toaster) and defining the strict nested routing via `react-router-dom`.
+- **`vite.config.ts`**: The bundler configuration optimizing TypeScript, styling, and port settings to enable Hot Module Replacement (HMR) and optimized minified production builds.
+- **`package.json`**: An index of all external packages (e.g., React, Tailwind, Supabase) along with the operational scripts required to build, format, and spin up the application gracefully.
+- **`.env.example`**: Outlines the explicit API keys required to bridge the local frontend to the Supabase backend. It acts as a template emphasizing what's necessary without exposing secrets.
+
+---
+
+## 🏁 Getting Started
+
+Follow these steps to safely configure and run the application locally.
+
+**1. Clone the repository**
+```bash
+git clone <repository-url>
+cd weekend-dump
+```
+
+**2. Install dependencies**
+```bash
+npm install
+```
+
+**3. Set up the environment**
+Duplicate `.env.example` to `.env` and fill in the missing Supabase variables.
+```bash
+cp .env.example .env
+```
+
+**4. Start the development server**
+```bash
+npm run dev
+```
+The App should now be running cleanly on `http://localhost:5173`.
+
+---
+
+## 🔑 Environment Variables
+
+The project heavily relies on secure bridging to the Supabase database. Inside your `.env` file, the following keys must be defined:
+
+| Variable | Description |
+|----------|-------------|
+| **`VITE_SUPABASE_PROJECT_ID`** | The unique identifier string for the assigned Supabase project instance. |
+| **`VITE_SUPABASE_PUBLISHABLE_KEY`** | The public "anon" API key allowing client-side authentication and reading of publicly-scoped data. |
+| **`VITE_SUPABASE_URL`** | The unified base URL (`https://<project_id>.supabase.co`) resolving queries to the database. |
+
+---
+
+## 📜 Commands
+
+The following operational commands are predefined within your `package.json` script registry.
+
+| Command | Action Performed |
+|---------|------------------|
+| `npm run dev` | Spins up the Vite localized development server with Hot Module Replacement (HMR). |
+| `npm run build` | Compiles the application into static files optimized for production deployments. |
+| `npm run preview` | Boots a localized preview server mimicking how the static build will act in production. |
+| `npm run lint` | Scans the codebase using ESLint to spot syntax or code-style violations based on predefined hooks. |
+| `npm run test` | Executes the Vitest unit testing suite to ensure function and component health. |
+| `npm run test:watch` | Keeps the testing suite actively watching for file changes to rerun tests automatically. |
+
+---
+
+## 🤝 Contributing
+
+We welcome improvements, bug squashing, and optimizations. If you’d like to shape the project, please follow our generic workflow:
+
+1. **Branch out:** Create a new feature branch out of the `main` stable branch (`git checkout -b feature/awesome-new-addition`).
+2. **Commit often:** Keep your commit messages descriptive, outlining exactly *why* the change happened.
+3. **Open a Pull Request:** Push your code up to GitHub and submit a PR for review. Ensure that your commits have completely tested logic and zero `npm run lint` errors before submission.
