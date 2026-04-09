@@ -90,5 +90,35 @@ export function getCurrentPeriodStart(): Date {
   return periodStart;
 }
 
+// ─── Previous Period Range ────────────────────────────────────────────────────
+// Returns the start and end timestamps for the period that ended just before 
+// the current mode started.
+export function getPreviousPeriodRange(): { start: Date; end: Date } {
+  const currentStart = getCurrentPeriodStart();
+  const end = new Date(currentStart.getTime() - 1000); // 1 second before current start
+  
+  const mode = getAppMode(currentStart); // This is the mode of the CURRENT period
+  const prevMode = mode === 'weekend' ? 'weekday' : 'weekend';
+  
+  const start = new Date(end);
+  start.setMinutes(0, 0, 0);
+
+  if (prevMode === 'weekend') {
+    // Roll back to previous Friday 18:00
+    // The 'end' is a Monday 00:00. 
+    // From Monday 00:00, go back to Friday 18:00 (approx 2 days and 6 hours)
+    start.setDate(start.getDate() - 2);
+    start.setHours(18);
+  } else {
+    // Roll back to previous Monday 00:00
+    // The 'end' is a Friday 18:00.
+    // From Friday 18:00, go back to Monday 00:00 (approx 4 days and 18 hours)
+    start.setDate(start.getDate() - 4);
+    start.setHours(0);
+  }
+
+  return { start, end };
+}
+
 export const LOCATIONS = ['SF', 'NYC', 'Bangalore', 'London', 'Berlin', 'Remote'] as const;
 export type LocationTag = typeof LOCATIONS[number];

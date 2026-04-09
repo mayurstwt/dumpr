@@ -1,16 +1,40 @@
 {
-  "name": "Weekend Dump",
-  "short_name": "Dump",
-  "description": "No accounts. No history. No trace.",
+  "name": "Dumpr — Anonymous Chaos",
+  "short_name": "Dumpr",
+  "description": "Drop your corporate rants and weekend chaos anonymously. No accounts. No history. No trace.",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0a0c10",
   "theme_color": "#f59e0b",
+  "categories": ["social", "entertainment"],
+  "lang": "en",
   "icons": [
     {
-      "src": "/vite.svg",
-      "sizes": "32x32",
-      "type": "image/svg+xml"
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Post a Dump",
+      "short_name": "Dump",
+      "description": "Quickly post a new dump",
+      "url": "/?action=post",
+      "icons": [{ "src": "/favicon.ico", "sizes": "48x48" }]
     }
   ]
 }

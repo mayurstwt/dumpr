@@ -95,30 +95,74 @@
     --sidebar-ring: 210 100% 56%;
   }
 
-  /* ─── Light Mode ─────────────────────────────────────────────────────────── */
-  .light {
-    --background: 0 0% 98%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
-    --primary: 38 92% 50%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 92%;
-    --secondary-foreground: 220 20% 15%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 220 10% 40%;
-    --accent: 0 72% 51%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 88%;
-    --input: 0 0% 90%;
-    --ring: 38 92% 50%;
-    --neon-glow: 38 92% 50%;
-    --dive-bar-red: 0 72% 51%;
-    --smoke: 0 0% 70%;
+  /* ─── Light Mode — Weekend (warm amber/peach) ──────────────────────────── */
+  .light,
+  .light .mode-weekend,
+  .light.mode-weekend {
+    --background: 38 30% 97%;
+    --foreground: 30 25% 12%;
+    --card: 38 20% 100%;
+    --card-foreground: 30 25% 12%;
+    --popover: 38 20% 100%;
+    --popover-foreground: 30 25% 12%;
+    --primary: 35 95% 45%;        /* rich amber */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 38 20% 93%;
+    --secondary-foreground: 30 20% 25%;
+    --muted: 38 15% 91%;
+    --muted-foreground: 30 15% 45%;
+    --accent: 14 90% 48%;         /* warm orange-red */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 35 20% 84%;
+    --input: 38 15% 90%;
+    --ring: 35 95% 45%;
+    --neon-glow: 35 95% 45%;
+    --dive-bar-red: 14 90% 48%;
+    --smoke: 35 15% 65%;
+    --sidebar-background: 38 20% 100%;
+    --sidebar-foreground: 30 25% 12%;
+    --sidebar-primary: 35 95% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 38 20% 93%;
+    --sidebar-accent-foreground: 30 25% 12%;
+    --sidebar-border: 35 20% 84%;
+    --sidebar-ring: 35 95% 45%;
+  }
+
+  /* ─── Light Mode — Weekday (cool blue/slate) ─────────────────────────────── */
+  .light.mode-weekday {
+    --background: 210 30% 97%;
+    --foreground: 215 30% 12%;
+    --card: 210 20% 100%;
+    --card-foreground: 215 30% 12%;
+    --popover: 210 20% 100%;
+    --popover-foreground: 215 30% 12%;
+    --primary: 210 100% 50%;      /* corporate blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 215 25% 22%;
+    --muted: 210 15% 90%;
+    --muted-foreground: 215 15% 44%;
+    --accent: 260 70% 55%;        /* purple accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 82%;
+    --input: 210 15% 88%;
+    --ring: 210 100% 50%;
+    --neon-glow: 210 100% 50%;
+    --dive-bar-red: 260 70% 55%;
+    --smoke: 210 15% 62%;
+    --sidebar-background: 210 20% 100%;
+    --sidebar-foreground: 215 30% 12%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 92%;
+    --sidebar-accent-foreground: 215 30% 12%;
+    --sidebar-border: 210 20% 82%;
+    --sidebar-ring: 210 100% 50%;
   }
 }
 
@@ -139,6 +183,18 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Mono', monospace;
   }
+
+  /* ─── Hide Scrollbars ────────────────────────────────────────────────────── */
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  * {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }
 
 @layer utilities {
@@ -151,7 +207,14 @@
   }
 
   .dive-bar-gradient {
-    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(220 20% 5%) 100%);
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 100%);
+  }
+
+  /* Dark mode keeps the deep gradient */
+  .dark .dive-bar-gradient,
+  .mode-weekend .dive-bar-gradient,
+  .mode-weekday .dive-bar-gradient {
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 60%, hsl(var(--background)) 100%);
   }
 
   /* Pinterest-style masonry gap fix */
@@ -208,3 +271,63 @@
 .mode-badge-pulse {
   animation: mode-badge-pulse 3s ease-in-out infinite;
 }
+
+/* ─── Mobile Improvements ──────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  /* Single column on very small phones */
+  .columns-2 {
+    columns: 1 !important;
+  }
+}
+
+/* Touch-friendly minimum tap targets */
+@media (hover: none) {
+  button {
+    min-height: 36px;
+    min-width: 36px;
+  }
+}
+
+/* Safe area padding for notched devices */
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.skeleton-shimmer {
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ─── Post success ring flash ────────────────────────────────────────────── */
+@keyframes ring-flash {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5); }
+  70% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+.ring-flash {
+  animation: ring-flash 0.6s ease-out;
+}
+
+/* ─── Marquee Animation ─────────────────────────────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+

@@ -16,27 +16,39 @@ export type Database = {
     Tables: {
       posts: {
         Row: {
+          channel: string | null
           content: string
           created_at: string
+          expires_at: string | null
           id: string
           location_tag: string
           media_url: string | null
+          metadata: Json | null
+          parent_id: string | null
           user_id: string
         }
         Insert: {
+          channel?: string | null
           content: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           location_tag?: string
           media_url?: string | null
+          metadata?: Json | null
+          parent_id?: string | null
           user_id: string
         }
         Update: {
+          channel?: string | null
           content?: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           location_tag?: string
           media_url?: string | null
+          metadata?: Json | null
+          parent_id?: string | null
           user_id?: string
         }
         Relationships: []
@@ -46,18 +58,21 @@ export type Database = {
           created_at: string
           id: string
           post_id: string
+          reaction_type: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           post_id: string
+          reaction_type?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           post_id?: string
+          reaction_type?: string | null
           user_id?: string
         }
         Relationships: [
